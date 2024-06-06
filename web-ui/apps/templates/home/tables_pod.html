@@ -1,0 +1,290 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Audited Pods In {{namespace}} {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+            <h6 class="text-white text-capitalize ps-3">Pods Audited In Namespace {{namespace}}</h6>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for pod_name in pods %}
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm"><a href='/view_pod?pod={{ pod_name }}&namespace={{ namespace }}'>{{ pod_name}}</a></h6>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header p-3">
+    <h5 class="mb-0">Audit Results</h5>
+    <p class="text-sm mb-0">
+      These are the namespace level security audit results for your namespace named {{ namespace }}
+    </p>
+  </div>
+  <div class="card-body p-3 pb-0">
+   
+
+    {% if not namespace_scan_data %}
+    <div class="alert alert-warning" role="alert">
+      No Results Found
+    </div>
+    {% else %}
+    {% if network_config == "No Network Policies found" %}
+    <div class="alert alert-warning" role="alert">
+      {{ namespace_scan_data.NetworkPolicies }}
+    </div>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+      Network Policy Found:
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>POD-SELECTOR</th>
+            <th>AGE</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in network_config %}
+          <tr>
+            <td>{{ data.name }}</td>
+            <td>{{ data.pod_selector }}</td>
+            <td>{{ data.age }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+
+    {% if netsuccess is true %}
+                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                        <h6 class="mb-3 text-sm">Network Policy Audit</h6>
+                        <span class="text-xs">
+                            <span class="text-dark ms-sm-2 font-weight-bold">Status:</span>
+                            <ul>
+                                <b> Ingress Analysis: </b>
+                                {% if ingress %}
+                                    <li>
+                                        Ingress traffic is allowed from ports: {{ ingress_ports }}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <b style="color:red">Ingress ports are not defined, It is recommended to define this for enhanced security.</b>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if pselector %}
+                                    <li>
+                                        Pod Selector Labels: {{ pod_selector }}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                      <b style="color:red"> No pod selectors defined.</b>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if nselector %}
+                                    <li>
+                                        Namespace Selector Labels: {{ namespace_selector_labels }}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <b style="color:red">No namespace selectors defined.</b>
+                                    </li>
+                                {% endif %}
+                                
+                                <b>Egress Analysis:</b>
+                                {% if egress %}
+                                    <li>
+                                        Egress traffic is allowed to ports: {{ egress_ports }}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                      <b style="color:red">  Egress ports are not defined, it is recommended to define them for enhanced security.</b>
+                                    </li>
+                                {% endif %}
+
+                                {% if pselector %}
+                                <li>
+                                    Pod Selector Labels: {{ pod_selector }}
+                                </li>
+                            {% else %}
+                                <li>
+                                  <b style="color:red"> No pod selectors defined.</b>
+                                </li>
+                            {% endif %}
+                            
+                            {% if nselector %}
+                                <li>
+                                    Namespace Selector Labels: {{ namespace_selector_labels }}
+                                </li>
+                            {% else %}
+                                <li>
+                                    <b style="color:red">No namespace selectors defined.</b>
+                                </li>
+                            {% endif %}
+                            </ul>
+                        </span>
+                    </div>
+                </li>
+            {% else %}
+            <!--
+                <li class="list-group-item">
+                    Network Policy is not present, it is recommended to define this for enhanced security.
+                </li>
+                -->
+            {% endif %}
+
+ 
+    {% if rc_data == 'NA' %}
+    <div class="alert alert-warning" role="alert">
+      Resource Quota is not configured.
+    </div>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+      Resource Quotas Found:
+    </div>
+    <div class="table-responsive">
+      {{ rc_data | safe }}
+    </div>
+    {% endif %}
+    {% if oc_check is false %}
+    <div class="alert alert-warning" role="alert">
+        Object Counts is not configured.</any>
+    </div>
+{% endif %}
+{% if rlimit_check is false %}
+    <div class="alert alert-warning" role="alert">
+        Resource Limit is not configured.</any>
+    </div>
+{% endif %}
+    {% if pod_security_policy == "No PSPs found" %}
+    <div class="alert alert-warning" role="alert">
+      PSP is not configured.
+    </div>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+      PSPs Found:
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>PRIV</th>
+            <th>CAPS</th>
+            <th>SELINUX</th>
+            <th>RUNASUSER</th>
+            <th>FSGROUP</th>
+            <th>SUPGROUP</th>
+            <th>READONLYROOTFS</th>
+            <th>VOLUMES</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in pod_security_policy %}
+          <tr>
+            <td>{{ data.name }}</td>
+            <td>{{ data.priv }}</td>
+            <td>{{ data.caps }}</td>
+            <td>{{ data.selinux }}</td>
+            <td>{{ data.runasuser }}</td>
+            <td>{{ data.fs_group }}</td>
+            <td>{{ data.sup_group }}</td>
+            <td>{{ data.readonly_rootfs }}</td>
+            <td>{{ data.volumes }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+    {% if scc == "No SCCs found" %}
+    <div class="alert alert-warning" role="alert">
+      SCC is not configured.
+    </div>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+      SCCs Found:
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>PRIV</th>
+            <th>CAPS</th>
+            <th>SELINUX</th>
+            <th>RUNASUSER</th>
+            <th>FSGROUP</th>
+            <th>SUPGROUP</th>
+            <th>READONLYROOTFS</th>
+            <th>VOLUMES</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in scc %}
+          <tr>
+            <td>{{ data.name }}</td>
+            <td>{{ data.priv }}</td>
+            <td>{{ data.caps }}</td>
+            <td>{{ data.selinux }}</td>
+            <td>{{ data.runasuser }}</td>
+            <td>{{ data.fs_group }}</td>
+            <td>{{ data.sup_group }}</td>
+            <td>{{ data.readonly_rootfs }}</td>
+            <td>{{ data.volumes }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+
+{% endblock content %}
+
+      
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

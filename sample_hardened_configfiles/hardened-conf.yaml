@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/dep-1: runtime/default
+  creationTimestamp: null
+  labels:
+    app: dep-1
+  name: dep-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dep-1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: dep-1
+    spec:
+      serviceAccountName: default
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - image: alpine:3.18.4
+        name: dep-1
+        command:
+          - sleep
+          - 2d
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 10000
+          runAsGroup: 10000
+            #fsGroup: 10000
+          privileged: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - all
+                #seccompProfile:
+                #type: Runtimedefault
+          seLinuxOptions:
+           level: "s0:c123,c456"  
+        resources: 
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+status: {}

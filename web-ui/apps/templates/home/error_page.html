@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Error! Oops {% endblock title %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="container-fluid py-4">
+    <div class="alert alert-warning alert-dismissible text-center text-white" role="alert">
+      {% if error_message %}
+        <span class="text-sm">Error: {{ error_message }}</span>
+      {% else %}
+        <span class="text-sm">Something went wrong!</span>
+        <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

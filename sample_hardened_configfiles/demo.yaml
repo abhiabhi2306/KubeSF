@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - command:
+    - sleep
+    - 2d
+    image: nginx
+    name: nginx
+    resources: {}
+  serviceAccountName: demo-sa-1

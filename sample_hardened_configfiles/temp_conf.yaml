@@ -1,0 +1,48 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: /home/abhi/.minikube/ca.crt
+    extensions:
+    - extension:
+        last-update: Fri, 10 Nov 2023 17:54:13 IST
+        provider: minikube.sigs.k8s.io
+        version: v1.31.2
+      name: cluster_info
+    server: https://localhost:40897
+  name: minikube
+- cluster:
+    certificate-authority: /home/abhi/.minikube/ca.crt
+    extensions:
+    - extension:
+        last-update: Tue, 19 Sep 2023 11:48:23 IST
+        provider: minikube.sigs.k8s.io
+        version: v1.31.2
+      name: cluster_info
+    server: https://localhost:45611
+  name: multinode-demo
+contexts:
+- context:
+    cluster: minikube
+    extensions:
+    - extension:
+        last-update: Fri, 10 Nov 2023 17:54:13 IST
+        provider: minikube.sigs.k8s.io
+        version: v1.31.2
+      name: context_info
+    namespace: default
+    user: minikube
+  name: minikube
+- context:
+    cluster: multinode-demo
+    extensions:
+    - extension:
+        last-update: Tue, 19 Sep 2023 11:48:23 IST
+        provider: minikube.sigs.k8s.io
+        version: v1.31.2
+      name: context_info
+    namespace: default
+    user: multinode-demo
+  name: multinode-demo
+current-context: minikube
+kind: Config
+preferences: {}

@@ -1,0 +1,913 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Pod Results {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<script>
+  const collapseExample = new bootstrap.Collapse(document.getElementById('collapseExample'));
+  const collapseExample2 = new bootstrap.Collapse(document.getElementById('collapseExample2'));
+
+  const button1 = document.querySelector('[href="#collapseExample"]');
+  const button2 = document.querySelector('[href="#collapseExample2"]');
+
+  button1.addEventListener('click', function (e) {
+      e.preventDefault();
+      collapseExample2.hide();
+      collapseExample.toggle();
+  });
+
+  button2.addEventListener('click', function (e) {
+      e.preventDefault();
+      collapseExample.hide();
+      collapseExample2.toggle();
+  });
+</script>
+
+
+
+
+
+<br>
+<div class="row">
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-header p-3 pt-2">
+        <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
+          <i class="material-icons opacity-10">warning</i>
+        </div>
+        <div class="text-end pt-1">
+          <p class="text-sm mb-0 text-capitalize">Static Analysis</p>
+          <h4 class="mb-0">{{warning_count}}</h4>
+        </div>
+      </div>
+      <hr class="dark horizontal my-0">
+      <div class="card-footer p-3">
+        <p class="mb-0"><span class="text-warning text-sm font-weight-bolder">Detected Issues</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-header p-3 pt-2">
+        <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+          <i class="material-icons opacity-10">check_circle</i>
+        </div>
+        <div class="text-end pt-1">
+          <p class="text-sm mb-0 text-capitalize">Static Analysis</p>
+          <h4 class="mb-0">{{pass_count}}</h4>
+        </div>
+      </div>
+      <hr class="dark horizontal my-0">
+      <div class="card-footer p-3">
+        <p class="mb-0"><span class="text-success text-sm font-weight-bolder">Best Practices Detected</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-header p-3 pt-2">
+        <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
+          <i class="material-icons opacity-10">info</i>
+        </div>
+        <div class="text-end pt-1">
+          <p class="text-sm mb-0 text-capitalize">Runtime Analysis</p>
+          <h4 class="mb-0">17</h4>
+        </div>
+      </div>
+      <hr class="dark horizontal my-0">
+      <div class="card-footer p-3">
+        <p class="mb-0"><span class="text-info text-sm font-weight-bolder">Testcases Evaluated</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</br>
+
+
+<center><p>
+  <a class="btn btn-info" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+    Static Analysis
+  </a>
+
+  <a class="btn btn-info" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample2">
+    Runtime Analysis
+  </a>
+
+
+</p></center>
+<div class="collapse" id="collapseExample">
+  <div class="row>
+    <div class="col-md-5 mt-4">
+      <div class="card h-100 mb-4">
+          <div class="card-header pb-0 px-3">
+              <div class="row">
+                  <div class="col-md-6">
+                      <h6 class="mb-0">Static Analysis</h6>
+                  </div>
+                  <div class="col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                      <i class="material-icons me-2 text-lg">date_range</i>
+                      <small>{{formatted_time}}</small>
+                  </div>
+              </div>
+          </div>
+          <div class="card-body pt-4 p-3">
+              <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">Results</h6>
+              <ul class="list-group">
+                  <!-- Add the modified content here -->
+                  {% for line in file_content.split('\n') %}
+                      {% if "[PASS]" in line %}
+                          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg green">
+                              <div class="d-flex align-items-center">
+                                  <i class="material-icons text-lg text-success">check</i>
+                                  <div class="d-flex flex-column">
+                                      <h6 class="mb-1 text-success text-sm">PASS</h6>
+                                      <span class="text-xs">{{ line }}</span>
+                                  </div>
+                              </div>
+                          </li>
+                      {% elif "Warning" in line %}
+                          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg yellow">
+                              <div class="d-flex align-items-center">
+                                  <i class="material-icons text-lg text-warning">warning</i>
+                                  <div class="d-flex flex-column">
+                                      <h6 class="mb-1 text-warning text-sm">Warning</h6>
+                                      <span class="text-xs">{{ line }}</span>
+                                  </div>
+                              </div>
+                          </li>
+                      {% elif "FAIL" in line %}
+                          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg blue">
+                              <div class="d-flex align-items-center">
+                                  <i class="material-icons text-lg text-danger">warning</i>
+                                  <div class="d-flex flex-column">
+                                      <h6 class="mb-1 text-danger text-sm">INFO</h6>
+                                      <span class="text-xs">{{ line }}</span>
+                                  </div>
+                              </div>
+                          </li>
+                      {% else %}
+                          <!-- Handle other cases here if needed -->
+                      {% endif %}
+                  {% endfor %}
+                  <!-- End modified content -->
+              </ul>
+          </div>
+      </div>
+    </div>
+    </br>
+    </div>
+</div>
+
+<div class="collapse" id="collapseExample2">
+  <div class="card card-body">
+      <div class="accordion-1">
+          <div class="container">
+              <div class="row my-5">
+                  <div class="col-md-6 mx-auto text-center">
+                      <h2>Runtime Analysis Results</h2>
+                      <p>You can find run-time-analysis results here</p>
+                  </div>
+              </div>
+              <div class="row">
+                  {% if uid_line is not none %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                      <div class="d-flex flex-column">
+                          <h6 class="mb-3 text-sm">User/Groups Analysis</h6>
+                          <span class="text-xs"><span class="text-dark ms-sm-2 font-weight-bold">{{ uid_line }}</span></span>
+                          <span class="text-xs">
+
+                          {% if uid_line is not none and uidn < 10000 and gid < 10000 %}
+                          </br>
+                          <b style="color:red;">Warning: Container is running with uid or gid less than 10000. It is recommended to run the container with higher uid and gid values.</b>
+                          {% else %}
+                        </br>
+                          <b style="color:green;">Success: Container is running with uid and gid above or equal to 10000. They are set appropriately.</b>
+                          {% endif %}
+                         </span>
+                      </div>
+                  </li>
+                  {% endif %}
+                  {% if dangerous_capabilities_found is not none %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Dangerous Capabilities</h6>
+                      <span class="text-xs">
+                        {% if dangerous_capabilities_found %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">{{ cap_msg }}</span>
+                          <ul>
+                            {% for capability in dangerous_capabilities_found %}
+                              <li>{{ capability }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+                  {% if caps_out is not none %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Dangerous Capabilities</h6>
+                      <span class="text-xs">
+                        {% if caps_out %}
+                            {% for line in caps_out %}
+                                {{ line }} 
+                            {% endfor %}
+                          <b style="color:red"></br></br>Dangerous Capabilities (If Any):</b>
+                          <ul>
+                            {% for capability2 in dang_caps_present %}
+                              <li>{{ capability2 }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+
+                  {% if bin_cap %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Binaries with Dangerous Capabilities</h6>
+                      <span class="text-xs">
+                        {% if bin_cap %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">These are the binaries with dangerous capabilities:</span>
+                          <ul>
+                            {% for binary in bin_cap %}
+                              <li>{{ binary }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+
+                  {% if result_ps_lines %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Process Evaluation</h6>
+                      <span class="text-xs">
+                        {% if result_ps_lines %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">These are the processes running in container:</span>
+                          <ul>
+                            {% for process in result_ps_lines %}
+                            {% for process2 in process %}
+                              <li>{{ process2 }}</li>
+                              {% endfor %}
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if suid_binaries %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">SUID Binaries</h6>
+                      <span class="text-xs">
+                        {% if suid_binaries %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">These are the SUID binaries present:</span>
+                          <ul>
+                            {% for binary in suid_binaries %}
+                              <li>{{ binary }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                      <span class="text-xs">
+                        {% if unusual_suid_binaries %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">These are the unusual suid binaries present:</span>
+                          <ul>
+                            {% for binary in unusual_suid_binaries %}
+                              <li>{{ binary }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          <b style="color:green;""> No unusual SUID binaries were found </b>
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if sgid_binaries %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">SGID Binaries</h6>
+                      <span class="text-xs">
+                        {% if sgid_binaries %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">These are the SUID binaries present:</span>
+                          <ul>
+                            {% for binary in sgid_binaries %}
+                              <li>{{ binary }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                      <span class="text-xs">
+                        {% if unusual_sgid_binaries %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">These are the unusual suid binaries present:</span>
+                          <ul>
+                            {% for binary in unusual_sgid_binaries %}
+                              <li>{{ binary }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          <b style="color:green;""> No unusual SGID binaries were found </b>
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if ulimit_value %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">ULIMIT Analysis</h6>
+                      <span class="text-xs">
+                        {% if ulimit_value %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">The container has the following ULIMIT value:</span>
+                          <ul>
+                          {{ ulimit_value}}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                        {% if ulimit_unlimited is true %}
+                        <b style="color:red">
+                            Warning: ulimit has not been configured. Failing to set this may lead to uncontrolled file descriptor usage, potentially resulting in resource exhaustion
+                        </b>
+                        {% else %}
+                        <b style="color:green">
+                            Success: Container has all ulimit values set to a value.
+                          </b>
+                          {% endif %}
+                      </span>
+
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if sensitive_data %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Pod Log Analysis</h6>
+                      <span class="text-xs">
+                        {% if sensitive_data %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">Pod log contains the following sensitive data:</span>
+                          <ul>
+                          {{ sensitive_data}}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                        {% if sensitive_data is not none %}
+                        <b style="color:red">
+                            Warning: Pod logs contains sensitive data
+                        </b>
+                        {% else %}
+                        <b style="color:green">
+                            PASS: Pod log doesn't have any sensitive data
+                        </b>
+                        {% endif %}
+      
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if docker_sockets_content %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Docket Socket Analysis</h6>
+                      <span class="text-xs">
+                        {% if docker_sockets_content %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">Docket Socket Analysis:</span>
+                          <ul>
+                          {{ docker_sockets_content}}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if readable_root_files is not none%}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Readable Files Belonging to Root and not World-Readable</h6>
+                      <span class="text-xs">
+                        {% if readable_root_files %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">Files:</span>
+                          <ul>
+                            {% for item in readable_root_files %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if interesting_writable_gfiles is not none%}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Interesting Files World-Writable By Group</h6>
+                      <span class="text-xs">
+                        {% if interesting_writable_gfiles %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">Files:</span>
+                          <ul>
+                            {% for item in interesting_writable_gfiles %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if users_with_shell_access_content %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Users with Shell Access</h6>
+                      <span class="text-xs">
+                        {% if users_with_shell_access_content %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">Users:</span>
+                          <ul>
+                            {% for item in users_with_shell_access_content %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+
+                  {% if sensitive_env_variables_content %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Sensitive Environment Variables</h6>
+                      <span class="text-xs">
+                        {% if sensitive_env_variables_content %}
+                          <span class="text-dark ms-sm-2 font-weight-bold">Results:</span>
+                          <ul>
+                          {{ sensitive_env_variables_content }}
+                          </ul>
+                          <b style="color:red;">The following sensitive environment variables were found, exposing secrets or sensitive information will lead to environment compromise if environment variables are leaked.</b>
+                        {% else %}
+                          <b> No sensitive environment variables were found </b>
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Sensitive Environment Variables</h6>
+                      <span class="text-xs">
+                          <span class="text-dark ms-sm-2 font-weight-bold"><b style="color:green;">No sensitive environment variables were found.</b></span>
+                      </span>
+                    </div>
+                  </li>                  {% endif %}
+
+
+                  {% if cron_jobs_content %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Cron Jobs</h6>
+                      <span class="text-xs">
+                        {% if cron_jobs_content %}
+                          <span class="text-dark ms-sm-2 font-weight-bold"> Cron Analysis:</span>
+                          {% if cron_dict %}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+             <!--  <th>Schedule</th>-->
+          <th>Cron Commands</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cron_dict %}
+        <tr>
+          <!-- <td>{{ item.Schedule }}</td> -->
+          <td>{{ item.Command }}</td>
+          
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No cron job information available.</p>
+  {% endif %}
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                      <span class="text-xs">
+                        {% if non_default_cron_jobs %}
+                          <span class="text-dark ms-sm-2 font-weight-bold"> Unusual Cron-Jobs:</span>
+                          <ul>
+                          {{ non_default_cron_jobs }}
+                          </ul>
+                        {% else %}
+                          <b style="color:green">Only default cronjobs were found,nothing unusual was found</b>
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+
+                  {% else %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Cronjob Analysis</h6>
+                      <span class="text-xs">
+                          <span class="text-dark ms-sm-2 font-weight-bold"><b style="color:green;">No cronjobs are found.</b></span>
+                      </span>
+                    </div>
+                  </li>
+
+                  {% endif %}
+
+                  {% if config_protection %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Kernel Hardening Info</h6>
+                      <span class="text-xs">
+                        {% if config_protection %}
+                          <span class="text-dark ms-sm-2 font-weight-bold"> Status:</span>
+                          <ul>
+                          {{ config_protection }}
+                          </ul>
+                          {% if Flag1 is none %}
+                          <b style="color:red">
+                              Warning: NoNewPrivs is set to false. Not setting this value to true increases the attack surface and may result in privilege escalation when exploited.
+                          </b>
+                          {% else %}
+                          <b style="color:green">
+                              PASS: Nonewprivs flag is already set
+                          </b>
+                          {% endif %}                
+                          
+                  {% if Flag2 is none %}
+                  <b style="color:red">
+                  </br> Warning: seccompProfile has not been configured. Failing to configure seccompProfile may result in invoking dangerous system calls when exploited
+                  </b>
+                  {% else %}
+                  <b style="color:red">
+                  </br> PASS: SECCOMP flag is already set.
+                  </b>
+                  {% endif %}
+                          {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+
+                  {% if network_info_content %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Network Services Running</h6>
+                      <span class="text-xs">
+                        {% if network_info_content %}
+                          <span class="text-dark ms-sm-2 font-weight-bold"> Status:</span>
+                          <ul>
+                          {{ network_info_content }}
+                          </ul>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Network Services Running</h6>
+                      <span class="text-xs">
+                          <span class="text-dark ms-sm-2 font-weight-bold"><b style="color:green">No Network Services are Running</b></span>
+                          <ul>
+                          {{ network_info_content }}
+                          </ul>
+                          </span>
+                          </div>
+                  {% endif %}
+
+                  {% if output_list %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Service Account Token Analysis</h6>
+                      <span class="text-xs">
+                        <span class="text-dark ms-sm-2 font-weight-bold">Status:</span>
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th scope="col">Resources</th>
+                              <th scope="col">Non-Resource URLs</th>
+                              <th scope="col">Resource Names</th>
+                              <th scope="col">Verbs</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for item in output_list %}
+                            <tr>
+                              <td>{{ item.Resources }}</td>
+                              <td>{{ item["Non-ResourceURLs"] }}</td>
+                              <td>{{ item["ResourceNames"] }}</td>
+                              <td>
+                                {% for verb in item.Verbs %}
+                                {% if contains_word(verb, ['create', 'delete', 'update', 'get', 'list','*']) == True and item["rtype"] == "cat1" %}
+                                <span style="color:red; font-weight:bold;">{{ verb }}</span>
+                            {% elif contains_word(verb, ['create', 'delete', 'update','*']) and item["rtype"] == "cat2" %}
+                                <span style="color:red; font-weight:bold;">{{ verb }}</span>
+                            {% else %}
+                                 {% if verb != "[]"%}
+                                 {% if verb != "," %}
+                                {{ verb }}
+                                {% endif %}
+                                {% endif %}
+                            {% endif %}
+                            
+                                  {% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                              </td>
+                            </tr>
+                          {% endfor %}
+                          </tbody>
+                        </table>
+                        <span style="color:red; font-weight:bold;">Note: Risky permissions pertaining to each resource are highlighted in RED</span>
+                      </span>
+                    </div>
+                  </li>
+                {% else %}
+                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-3 text-sm">Service Account Token Analysis</h6>
+                      <span class="text-xs">None</span>
+                    </div>
+                  </li>
+                {% endif %}
+
+                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                  <div class="d-flex flex-column">
+                    <h6 class="mb-3 text-sm">Other Additional Checks</h6>
+                    <span class="text-xs">
+                      {% if writable_passwd_status is true %}
+                      <span class="text-dark ms-sm-2 font-weight-bold">/etc/passwd permission check:
+                    </br>
+                          <b style="color:red">
+                            Warning: /etc/passwd file is writable. This may result in privilege escalation when exploited.
+                        </b>
+                      </span>
+                      {% else %}
+                      <span class="text-dark ms-sm-2 font-weight-bold">/etc/passwd file check:
+                      </br>
+                          <b style="color:green">
+                                  /etc/passwd file is not writable.
+                        </b>
+                      </span>
+                      {% endif %}                      
+
+                      <!--
+                {% if netsuccess is true %}
+                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                    <div class="d-flex flex-column">
+                        <h6 class="mb-3 text-sm">Network Policy Audit</h6>
+                        <span class="text-xs">
+                            <span class="text-dark ms-sm-2 font-weight-bold">Status:</span>
+                            <ul>
+                                <b> Ingress Analysis: </b>
+                                {% if ingress %}
+                                    <li>
+                                        Ingress traffic is allowed from ports: {{ ingress_ports }}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <b style="color:red">Ingress ports are not defined, It is recommended to define this for enhanced security.</b>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if pselector %}
+                                    <li>
+                                        Pod Selector Labels: {{ pod_selector }}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                      <b style="color:red"> No pod selectors defined.</b>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if nselector %}
+                                    <li>
+                                        Namespace Selector Labels: {{ namespace_selector_labels }}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <b style="color:red">No namespace selectors defined.</b>
+                                    </li>
+                                {% endif %}
+                                
+                                <b>Egress Analysis:</b>
+                                {% if egress %}
+                                    <li>
+                                        Egress traffic is allowed to ports: {{ egress_ports }}
+                                    </li>
+                                {% else %}
+                                    <li>
+                                      <b style="color:red">  Egress ports are not defined, it is recommended to define them for enhanced security.</b>
+                                    </li>
+                                {% endif %}
+
+                                {% if pselector %}
+                                <li>
+                                    Pod Selector Labels: {{ pod_selector }}
+                                </li>
+                            {% else %}
+                                <li>
+                                  <b style="color:red"> No pod selectors defined.</b>
+                                </li>
+                            {% endif %}
+                            
+                            {% if nselector %}
+                                <li>
+                                    Namespace Selector Labels: {{ namespace_selector_labels }}
+                                </li>
+                            {% else %}
+                                <li>
+                                    <b style="color:red">No namespace selectors defined.</b>
+                                </li>
+                            {% endif %}
+                            </ul>
+                        </span>
+                    </div>
+                </li>
+            {% else %}
+                <li class="list-group-item">
+                    Network Policy is not present, it is recommended to define this for enhanced security.
+                </li>
+            {% endif %}
+            
+              -->
+                
+            </div>
+          </div>
+            {% if runtime_fail is true %}
+
+            <div class="alert alert-danger" role="alert">
+              We could not perform run-time-analysis due to some errors.
+            </div>
+
+            {% endif %}
+
+<!--
+                  {% if writable_passwd_status is true %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: /etc/passwd file is writable
+                  </div>
+                  {% else %}
+                  <div class="alert alert-success" role="alert">
+                      PASS: /etc/passwd file is not writable
+                  </div>
+                  {% endif %}
+-->
+
+                  <!--
+
+               
+                  {% if Flag2 is none %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: seccompProfile has not been configured. Failing to configure seccompProfile may result in invoking dangerous system calls when exploited
+                  </div>
+                  {% else %}
+                  <div class="alert alert-success" role="alert">
+                      PASS: SECCOMP flag is already set.
+                  </div>
+                  {% endif %}
+
+                  -->
+
+                  {% if sensitive_data is not none %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: Pod logs contains sensitive data
+                  </div>
+                  {% else %}
+                  <div class="alert alert-success" role="alert">
+                      PASS: Pod log doesn't have any sensitive data
+                  </div>
+                  {% endif %}
+
+                                    <!--
+
+                  {% if ulimit_unlimited is true %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: ulimit has not been configured. Failing to set this may lead to uncontrolled file descriptor usage, potentially resulting in resource exhaustion
+                  </div>
+                  {% else %}
+                  <div class="alert alert-success" role="alert">
+                      Success: Container has all ulimit values set to a value.
+                  </div>
+                  {% endif %}
+
+                  {% if suid_binaries is not none %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: Container is having some suid binaries. It is recommended to remove them.
+                  </div>
+                  {% else %}
+                  <div class="alert alert-success" role="alert">
+                      Success: Container is not having any suid binaries
+                  </div>
+                  {% endif %}
+
+
+
+                  {% if sgid_binaries is not none %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: Container is having some sgid binaries. It is recommended to remove them.
+                  </div>
+                  {% else %}
+                  <div class="alert alert-success" role="alert">
+                      Success: Container is not having any sgid binaries
+                  </div>
+                  {% endif %}
+
+                  {% if uid_line is not none and uidn < 10000 and gid < 10000 %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: Container is running with uid or gid less than 10000. It is recommended to run the container with higher uid and gid values.
+                  </div>
+                  {% else %}
+                  <div class="alert alert-success" role="alert">
+                      Success: Container is running with uid and gid above or equal to 10000. They are set appropriately.
+                  </div>
+                  {% endif %}
+
+                  {% if dangerous_capabilities_found is none %}
+                  <div class="alert alert-success" role="alert">
+                      The container does not have any dangerous capabilities enabled, the available capabilities are : {{ capabilities_list }}
+                  </div>
+                  {% else %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: The container has dangerous capabilities enabled
+                    </div>
+
+                  {% endif %}
+                  {% if bin_cap is none %}
+                  <div class="alert alert-success" role="alert">
+                      The container does not have any binaries with capabilities enabled
+                  </div>
+                  {% else %}
+                  <div class="alert alert-warning" role="alert">
+                      Warning: The container has binaries with dangerous capabilities enabled
+                    </div>
+
+                  {% endif %}
+
+                                    -->
+
+    
+      </div>
+  </div>
+</div>
+
+</div>
+
+
+{% endblock content %}
+
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

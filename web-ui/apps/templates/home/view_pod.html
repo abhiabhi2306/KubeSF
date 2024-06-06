@@ -1,0 +1,152 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Audited Pods In {{ namespace }} {% endblock %}
+
+<!-- Specific Page CSS goes HERE -->
+{% block stylesheets %}{% endblock %}
+
+{% block content %}
+<br />
+<div class="row">
+  <div class="col-xl-3 col-sm-6">
+    <div class="card">
+      <div class="card-header p-3 pt-2">
+        <div class="icon icon-lg icon-shape {% if resource_type == 'Pod' %}bg-gradient-warning{% elif resource_type in ['ReplicaSet', 'Deployment'] %}bg-gradient-warning{% endif %} shadow-warning text-center border-radius-xl mt-n4 position-absolute">
+          <i class="material-icons opacity-10">{% if resource_type == 'Pod' %}settings{% elif resource_type in ['ReplicaSet', 'Deployment'] %}settings{% endif %}</i>
+        </div>
+        <div class="text-end pt-1">
+          <p class="text-sm mb-0 text-capitalize">Deployed As</p>
+          <h4 class="mb-0">{{ resource_type }}</h4>
+        </div>
+      </div>
+      <hr class="dark horizontal my-0">
+      <div class="card-footer p-3">
+        <p class="mb-0"><span class="{% if resource_type == 'Pod' %}text-warning{% elif resource_type in ['ReplicaSet', 'Deployment'] %}text-warning{% endif %} text-sm font-weight-bolder">Resource Name: {{ pod_param }}</span></p>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-header p-3 pt-2">
+        <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+          <i class="material-icons">computer</i>
+        </div>
+        <div class="text-end pt-1">
+          <p class="text-sm mb-0 text-capitalize">Kernel Version</p>
+          <h4 class="mb-0">{{ kernel_version }}</h4>
+        </div>
+      </div>
+      <hr class="dark horizontal my-0">
+      <div class="card-footer p-3">
+        <p class="mb-0">Architecture: <span class="text-info text-sm font-weight-bolder">{{ architecture }} </span></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-header p-3 pt-2">
+        <div class="icon icon-lg icon-shape bg-gradient-danger shadow-danger text-center border-radius-xl mt-n4 position-absolute">
+          <i class="material-icons">bug_report</i>
+        </div>
+        <div class="text-end pt-1">
+          <p class="text-sm mb-0 text-capitalize">CVEs Found</p>
+          <h4 class="mb-0">{{ num_cves }}</h4>
+        </div>
+      </div>
+      <hr class="dark horizontal my-0">
+      <div class="card-footer p-3">
+        <p class="mb-0">Find more info below.<span class="text-danger text-sm font-weight-bolder"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+<br />
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+            <h6 class="text-white text-capitalize ps-3">Affected CVE(s)</h6>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Title</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Reference URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if exploit_data %}
+                  {% for exploit in exploit_data %}
+                  <tr>
+                    <td>
+                      {% set title_parts = exploit['Title'].split(']') %}
+                      {% set cve_part = title_parts[0] + ']' %}
+                      <span style="color: rgba(236, 0, 0, 0.897);">{{ cve_part }}</span><b>{{ title_parts[1] }}</b>
+                    </td>
+                    <td>{{ exploit['Exposure'] }}</td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="2">No data available</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+            <h6 class="text-white text-capitalize ps-3">Containers Found</h6>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for container_name in matching_containers %}
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm"><a href="/result?container={{ container_name }}&namespace={{ namespace }}&pod={{pod_param}}">{{ container_name }}</a></h6>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}{% endblock javascripts %}
