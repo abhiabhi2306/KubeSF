@@ -7,7 +7,7 @@
     <img src="https://img.shields.io/badge/version-0.1.0-blue.svg" title="version" alt="version">
 </p>
 
-Welcome to **KubePWN**, An ultimate solution for Kubernetes security audits. KubePWN is a powerful security audit tool designed to assess the security of a Kubernetes clusters at namespace and pod level. By combining static and runtime analysis, KubePWN helps in identifing vulnerabilities and potential security risks, ensuring that the Kubernetes environment is robust and secure.
+Welcome to **KubeSF**, An ultimate solution for Kubernetes security audits. KubeSF is a powerful security audit tool designed to assess the security of a Kubernetes clusters at namespace and pod level. By combining static and runtime analysis, KubeSF helps in identifing vulnerabilities and potential security risks, ensuring that the Kubernetes environment is robust and secure.
 
 ## Features
 
@@ -31,8 +31,8 @@ Welcome to **KubePWN**, An ultimate solution for Kubernetes security audits. Kub
 
 1. **Clone the Repository:**
    ```
-   git clone https://github.com/abhiabhi2306/KubePWN.git
-   cd KubePWN
+   git clone https://github.com/abhiabhi2306/KubeSF.git
+   cd KubeSF
    ```
 
 2. **Install the necessary packages**
