@@ -1,4 +1,4 @@
-# KubePWN: Kubernetes Security Audit Tool :shield:
+# KubeSF: Kubernetes Security Audit Tool :shield:
 
 ![alt text](https://i.postimg.cc/BbSGZ5Fn/logo-rem.png)
 
